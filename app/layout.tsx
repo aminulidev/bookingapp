@@ -1,4 +1,6 @@
+import { getCurrentUser } from "./actions/getCurrentUser";
 import ClientOnly from "./components/ClientOnly";
+import LoginModal from "./components/modals/LoginModal";
 import RegisterModal from "./components/modals/RegisterModal";
 import Navbar from "./components/navbar/Navbar";
 import "./globals.css";
@@ -9,18 +11,20 @@ export const metadata = {
 	description: "Hotel Booking App. Your Perfect Resourt.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
+	const currentUser = await getCurrentUser();
 	return (
 		<html lang="en">
 			<body>
 				<ClientOnly>
 					<ToasterProvider />
 					<RegisterModal />
-					<Navbar />
+					<LoginModal />
+					<Navbar currentUser={currentUser} />
 				</ClientOnly>
 
 				{children}

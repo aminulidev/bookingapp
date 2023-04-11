@@ -1,20 +1,23 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import axios from "axios";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
-import useRegisterModal from "@/app/hooks/useRegisterModal";
+import useLoginModal from "@/app/hooks/useLoginModal";
 import Modals from "./Modals";
 import Heading from "../Heading";
 import Input from "../inputs/Input";
 import { toast } from "react-hot-toast";
 import Button from "../Button";
+import { useRouter } from "next/navigation";
 
-const RegisterModal = () => {
-	const registerModal = useRegisterModal();
+const LoginModal = () => {
+	const router = useRouter();
+	const loginModal = useLoginModal();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const {
@@ -23,7 +26,6 @@ const RegisterModal = () => {
 		formState: { errors },
 	} = useForm<FieldValues>({
 		defaultValues: {
-			name: "",
 			email: "",
 			password: "",
 		},
@@ -32,17 +34,22 @@ const RegisterModal = () => {
 	const onSubmit: SubmitHandler<FieldValues> = (data) => {
 		setIsLoading(true);
 
-		axios
-			.post("/api/register", data)
-			.then(() => {
-				registerModal.onClose();
-			})
-			.catch((error) => {
-				toast.error("Invalid Input!");
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
+		signIn("credentials", {
+			...data,
+			redirect: false,
+		}).then((callback) => {
+			setIsLoading(false);
+
+			if (callback?.ok) {
+				toast.success("Logged in");
+				router.refresh();
+				loginModal.onClose();
+			}
+
+			if (callback?.error) {
+				toast.error(callback.error);
+			}
+		});
 	};
 
 	const bodyContent = (
@@ -50,17 +57,9 @@ const RegisterModal = () => {
 			<Heading
 				center
 				title="Welcome to Booking App"
-				subTitle="Create an Account!"
+				subTitle="Login Your Account"
 			/>
 
-			<Input
-				id="name"
-				label="Name"
-				disabled={isLoading}
-				register={register}
-				errors={errors}
-				required
-			/>
 			<Input
 				id="email"
 				type="email"
@@ -87,24 +86,24 @@ const RegisterModal = () => {
 			<hr />
 			<Button
 				outline
-				label="Continue with Google"
+				label="Login with Google"
 				icon={FcGoogle}
 				onClick={() => {}}
 			/>
 			<Button
 				outline
-				label="Continue with Github"
+				label="Login with Github"
 				icon={AiFillGithub}
 				onClick={() => {}}
 			/>
 			<div className="text-neutral-500 text-center mt-4 font-light">
 				<p>
-					Already have an account?
+					Don't have an account?
 					<span
 						onClick={() => {}}
 						className="text-neutral-800 cursor-pointer ml-1 hover:underline"
 					>
-						Log in
+						Register
 					</span>
 				</p>
 			</div>
@@ -114,10 +113,10 @@ const RegisterModal = () => {
 	return (
 		<Modals
 			disabled={isLoading}
-			isOpen={registerModal.isOpen}
-			title="Register"
-			actionLabel="Register"
-			onClose={registerModal.onClose}
+			isOpen={loginModal.isOpen}
+			title="Login"
+			actionLabel="Login"
+			onClose={loginModal.onClose}
 			onSubmit={handleSubmit(onSubmit)}
 			body={bodyContent}
 			footer={footerContent}
@@ -125,4 +124,4 @@ const RegisterModal = () => {
 	);
 };
 
-export default RegisterModal;
+export default LoginModal;
