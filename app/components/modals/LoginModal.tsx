@@ -88,17 +88,17 @@ const LoginModal = () => {
 				outline
 				label="Login with Google"
 				icon={FcGoogle}
-				onClick={() => {}}
+				onClick={() => signIn("google")}
 			/>
 			<Button
 				outline
 				label="Login with Github"
 				icon={AiFillGithub}
-				onClick={() => {}}
+				onClick={() => signIn("github")}
 			/>
 			<div className="text-neutral-500 text-center mt-4 font-light">
 				<p>
-					Don't have an account?
+					Dont have an account?
 					<span
 						onClick={() => {}}
 						className="text-neutral-800 cursor-pointer ml-1 hover:underline"
