@@ -8,6 +8,8 @@ import { useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 import useLoginModal from "@/app/hooks/useLoginModal";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
+
 import Modals from "./Modals";
 import Heading from "../Heading";
 import Input from "../inputs/Input";
@@ -18,6 +20,7 @@ import { useRouter } from "next/navigation";
 const LoginModal = () => {
 	const router = useRouter();
 	const loginModal = useLoginModal();
+	const registerModal = useRegisterModal();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const {
@@ -51,6 +54,11 @@ const LoginModal = () => {
 			}
 		});
 	};
+
+	const registerToggle = useCallback(() => {
+		loginModal.onClose();
+		registerModal.onOpen();
+	}, [loginModal, registerModal]);
 
 	const bodyContent = (
 		<div className="flex flex-col gap-4">
@@ -100,7 +108,7 @@ const LoginModal = () => {
 				<p>
 					Dont have an account?
 					<span
-						onClick={() => {}}
+						onClick={registerToggle}
 						className="text-neutral-800 cursor-pointer ml-1 hover:underline"
 					>
 						Register
