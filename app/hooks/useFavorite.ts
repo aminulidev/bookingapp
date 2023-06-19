@@ -8,50 +8,56 @@ import { SafeUser } from "@/app/types";
 import useLoginModal from "./useLoginModal";
 
 interface IUseFavorite {
-	listingId: string;
-	currentUser?: SafeUser | null;
+  listingId: string;
+  currentUser?: SafeUser | null
 }
 
 const useFavorite = ({ listingId, currentUser }: IUseFavorite) => {
-	const router = useRouter();
+  const router = useRouter();
 
-	const loginModal = useLoginModal();
+  const loginModal = useLoginModal();
 
-	const hasFavorited = useMemo(() => {
-		const list = currentUser?.favoriteIds || [];
+  const hasFavorited = useMemo(() => {
+    const list = currentUser?.favoriteIds || [];
 
-		return list.includes(listingId);
-	}, [currentUser, listingId]);
+    return list.includes(listingId);
+  }, [currentUser, listingId]);
 
-	const toggleFavorite = useCallback(
-		async (e: React.MouseEvent<HTMLDivElement>) => {
-			e.stopPropagation();
+  const toggleFavorite = useCallback(async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
 
-			if (!currentUser) {
-				return loginModal.onOpen();
-			}
+    if (!currentUser) {
+      return loginModal.onOpen();
+    }
 
-			try {
-				let request;
+    try {
+      let request;
 
-				if (hasFavorited) {
-					request = () => axios.delete(`/api/favorites/${listingId}`);
-					toast.error("Removed from Favorite!");
-				} else {
-					request = () => axios.post(`/api/favorites/${listingId}`);
-					toast.success("Added to Favorite!");
-				}
+      if (hasFavorited) {
+        request = () => axios.delete(`/api/favorites/${listingId}`);
+      } else {
+        request = () => axios.post(`/api/favorites/${listingId}`);
+      }
 
-				await request();
-				router.refresh();
-			} catch (error) {
-				toast.error("Somethins went wrong!");
-			}
-		},
-		[currentUser, hasFavorited, listingId, loginModal, router]
-	);
+      await request();
+      router.refresh();
+      toast.success('Success');
+    } catch (error) {
+      toast.error('Something went wrong.');
+    }
+  }, 
+  [
+    currentUser, 
+    hasFavorited, 
+    listingId, 
+    loginModal,
+    router
+  ]);
 
-	return { hasFavorited, toggleFavorite };
-};
+  return {
+    hasFavorited,
+    toggleFavorite,
+  }
+}
 
 export default useFavorite;
