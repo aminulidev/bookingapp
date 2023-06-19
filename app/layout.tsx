@@ -14,6 +14,9 @@ import RentModal from "./components/modals/RentModal";
 export const metadata = {
 	title: "Booking App",
 	description: "Love to Travel",
+	icons: {
+		icon: "/images/logo/favicon.ico",
+	},
 };
 
 const font = Nunito({
